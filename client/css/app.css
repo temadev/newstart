@@ -7,14 +7,16 @@ body {
 }
 
 #cover {
-    position:absolute;
-    height:100%;
-    width:100%;
-    background:white;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: white;
 }
 
 #userInfo {
-    float:right;padding:8px;
+    float: right;
+	padding: 15px 0;
+	color: #fff;
 }
 
 .icon-twitter {
@@ -27,6 +29,14 @@ body {
 
 .icon-google-plus-sign {
     color: #D74634;
+}
+
+.icon-github {
+    color: #000;
+}
+
+.icon-linkedin-sign {
+    color: #1783bc;
 }
 
 .fade-hide-setup, .fade-show-setup {

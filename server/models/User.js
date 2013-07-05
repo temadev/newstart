@@ -1,6 +1,5 @@
 var mongoose = require('mongoose'),
 //	User = mongoose.model('User'),
-	User,
 	_ = require('underscore'),
 	check = require('validator').check,
 	userRoles = require('../../client/js/routingConfig').userRoles;

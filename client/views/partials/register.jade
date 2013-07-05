@@ -1,4 +1,5 @@
-h1 Register
+.page-header
+    h1 Register
 form.form-horizontal(ng-submit="register()", name="registerForm")
     .control-group
         label.control-label(for="username") Username
@@ -19,7 +20,7 @@ form.form-horizontal(ng-submit="register()", name="registerForm")
         .controls
             button.btn(type="submit", data-ng-disabled="registerForm.$invalid") Submit
 
-    .alert.alert-error(ng-show="registerForm.$invalid")
+    .alert.alert-warning(ng-show="registerForm.$invalid")
         strong Please correct the following errors:
         ul
             li(ng-show="registerForm.username.$error.required") Username is required

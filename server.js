@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== 'test')
 
 app.set('views', __dirname + '/client/views');
 app.set('view engine', 'jade');
-app.use(require('less-middleware')({ src: __dirname + '/public' }));
+app.use(require('less-middleware')({ src: __dirname + '/client' }));
 app.use(express.static(path.join(__dirname, 'client')));
 app.use(express.favicon());
 
