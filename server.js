@@ -21,7 +21,7 @@ var env = process.env.NODE_ENV || 'development',
 mongoose.connect(config.db);
 
 // *** here we should load our models
-var User = require('./server/models/User.js');
+var User = require('./server/models/Mongo.js');
 
 // passport config
 require('./server/passport')(passport, config, User);

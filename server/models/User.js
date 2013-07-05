@@ -1,5 +1,4 @@
 var mongoose = require('mongoose'),
-//	User = mongoose.model('User'),
 	_ = require('underscore'),
 	check = require('validator').check,
 	userRoles = require('../../client/js/routingConfig').userRoles;
@@ -22,25 +21,6 @@ var users = [
 ];
 
 module.exports = {
-	addUser: function (username, password, role, callback) {
-		if (this.findByUsername(username) !== undefined)  return callback("UserAlreadyExists");
-
-		// Clean up when 500 users reached
-		if (users.length > 500) {
-			users = users.slice(0, 2);
-		}
-
-		var user = {
-			id: _.max(users,function (user) {
-				return user.id;
-			}).id + 1,
-			username: username,
-			password: password,
-			role: role
-		};
-		users.push(user);
-		callback(null, user);
-	},
 
 	findOrCreateOauthUser: function (provider, providerId) {
 		var user = module.exports.findByProviderId(provider, providerId);
@@ -58,24 +38,6 @@ module.exports = {
 		}
 
 		return user;
-	},
-
-	findAll: function () {
-		return _.map(users, function (user) {
-			return _.clone(user);
-		});
-	},
-
-	findById: function (id) {
-		return _.clone(_.find(users, function (user) {
-			return user.id === id
-		}));
-	},
-
-	findByUsername: function (username) {
-		return _.clone(_.find(users, function (user) {
-			return user.username === username;
-		}));
 	},
 
 	findByProviderId: function (provider, id) {

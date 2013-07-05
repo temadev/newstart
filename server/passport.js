@@ -6,25 +6,40 @@ var mongoose = require('mongoose'),
 	GoogleStrategy = require('passport-google').Strategy,
 	GitHubStrategy = require('passport-github').Strategy,
 	LinkedInStrategy = require('passport-linkedin').Strategy;
-//	User = mongoose.model('User');
 
 module.exports = function (passport, config, User) {
+
+	// serialize sessions
+	passport.serializeUser(function (user, done) {
+		done(null, user.id)
+	});
+
+	passport.deserializeUser(function (id, done) {
+		User.findById(id, function (err, user) {
+			if (user) {
+				done(null, user);
+			}
+			else {
+				done(null, false);
+			}
+		});
+	});
 
 	passport.use(
 		new LocalStrategy(
 			function (username, password, done) {
 
-				var user = User.findByUsername(username);
-
-				if (!user) {
-					done(null, false, { message: 'Incorrect username.' });
-				}
-				else if (user.password != password) {
-					done(null, false, { message: 'Incorrect username.' });
-				}
-				else {
-					return done(null, user);
-				}
+				User.findOne({username: username}, function (err, user) {
+					if (!user) {
+						done(null, false, { message: 'Incorrect username.' });
+					}
+					else if (user.password != password) {
+						done(null, false, { message: 'Incorrect username.' });
+					}
+					else {
+						return done(null, user);
+					}
+				});
 			}
 		)
 	);
@@ -105,21 +120,5 @@ module.exports = function (passport, config, User) {
 			}
 		)
 	);
-
-	// serialize sessions
-	passport.serializeUser(function (user, done) {
-		done(null, user.id)
-	});
-
-	passport.deserializeUser(function (id, done) {
-		var user = User.findById(id);
-
-		if (user) {
-			done(null, user);
-		}
-		else {
-			done(null, false);
-		}
-	});
 
 };

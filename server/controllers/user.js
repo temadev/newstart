@@ -1,18 +1,20 @@
 var _ = require('underscore'),
-	User = require('../models/User.js'),
-	userRoles = require('../../client/js/routingConfig').userRoles;
+	User = require('../models/Mongo.js');
 
 module.exports = {
 	index: function (req, res) {
-		var users = User.findAll();
-		_.each(users, function (user) {
-			delete user.password;
-			delete user.twitter;
-			delete user.facebook;
-			delete user.google;
-			delete user.linkedin;
-			delete user.github;
+		User.find({},function(err, users) {
+			if(err) console.log(err);
+			users.forEach(function (user) {
+				delete user.password;
+				delete user.twitter;
+				delete user.facebook;
+				delete user.google;
+				delete user.linkedin;
+				delete user.github;
+			});
+
+			res.json(users);
 		});
-		res.json(users);
 	}
 };

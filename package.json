@@ -18,6 +18,7 @@
 	    "underscore": "latest",
 	    "validator": "latest",
 	    "mongoose": "latest",
+	    "angular-bridge": "latest",
         "passport": "latest",
         "passport-local": "latest",
         "passport-twitter": "latest",
