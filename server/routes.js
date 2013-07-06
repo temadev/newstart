@@ -3,7 +3,7 @@ var _ = require('underscore'),
 	passport = require('passport'),
 	AuthCtrl = require('./controllers/auth'),
 	UserCtrl = require('./controllers/user'),
-	User = require('./models/Mongo.js'),
+	User = require('./models/User.js'),
 	userRoles = require('../client/js/routingConfig').userRoles,
 	accessLevels = require('../client/js/routingConfig').accessLevels;
 
@@ -58,23 +58,6 @@ var routes = [
 		accessLevel: accessLevels.public
 	},
 	{
-		path: '/auth/google',
-		httpMethod: 'GET',
-		middleware: [passport.authenticate('google')],
-		accessLevel: accessLevels.public
-	},
-	{
-		path: '/auth/google/return',
-		httpMethod: 'GET',
-		middleware: [
-			passport.authenticate('google', {
-				successRedirect: '/',
-				failureRedirect: '/login'
-			})
-		],
-		accessLevel: accessLevels.public
-	},
-	{
 		path: '/auth/github',
 		httpMethod: 'GET',
 		middleware: [passport.authenticate('github')],
@@ -85,23 +68,6 @@ var routes = [
 		httpMethod: 'GET',
 		middleware: [
 			passport.authenticate('github', {
-				successRedirect: '/',
-				failureRedirect: '/login'
-			})
-		],
-		accessLevel: accessLevels.public
-	},
-	{
-		path: '/auth/linkedin',
-		httpMethod: 'GET',
-		middleware: [passport.authenticate('linkedin')],
-		accessLevel: accessLevels.public
-	},
-	{
-		path: '/auth/linkedin/callback',
-		httpMethod: 'GET',
-		middleware: [
-			passport.authenticate('linkedin', {
 				successRedirect: '/',
 				failureRedirect: '/login'
 			})
@@ -197,8 +163,6 @@ function ensureAuthorized(req, res, next) {
 	if (!req.user) return res.send(401);
 
 	var accessLevel = _.findWhere(routes, { path: req.route.path }).accessLevel || accessLevels.public;
-	console.log(accessLevel);
-	console.log(req.user);
 	if (!(accessLevel.bitMask & req.user.role.bitMask)) return res.send(403);
 
 	return next();

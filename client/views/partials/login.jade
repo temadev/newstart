@@ -3,9 +3,9 @@
         h1 Log in
     form.form-horizontal(ng-submit="login()", name="loginForm")
         .control-group
-            label.control-label(for="username") Username
+            label.control-label(for="email") Email
             .controls
-                input(type="text", data-ng-model="username", placeholder="Username", name="username", required)
+                input(type="text", data-ng-model="email", placeholder="Email", name="email", required)
         .control-group
             label.control-label(for="password") Password
             .controls
@@ -27,9 +27,6 @@
         a.btn(href="", data-ng-click="loginOauth('twitter')")
             i.icon-twitter
             |  Twitter
-        a.btn(href="", data-ng-click="loginOauth('google')")
-            i.icon-google-plus-sign
-            |  Google
         a.btn(href="", data-ng-click="loginOauth('github')")
             i.icon-github
             |  GitHub

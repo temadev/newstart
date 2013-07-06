@@ -1,63 +1,141 @@
 var mongoose = require('mongoose'),
+	Schema = mongoose.Schema,
+	crypto = require('crypto'),
 	_ = require('underscore'),
-	check = require('validator').check,
-	userRoles = require('../../client/js/routingConfig').userRoles;
+	userRoles = require('../../client/js/routingConfig').userRoles,
+	authTypes = ['facebook', 'twitter', 'github'];
 
-var users = [
-	{
-		id: 1,
-		username: "user",
-		email: "user@user.com",
-		password: "123",
-		role: userRoles.user
-	},
-	{
-		id: 2,
-		username: "admin",
-		email: "admin@admin.com",
-		password: "123",
-		role: userRoles.admin
-	}
-];
+/**
+ * User Schema
+ */
 
-module.exports = {
+var UserSchema = new Schema({
+	username: { type: String, default: ''},
+	email: { type: String, default: '' },
+	role: {},
+	hashed_password: { type: String, default: '' },
+	salt: { type: String, default: '' },
+	provider: { type: String, default: '' },
+	facebook: {},
+	twitter: {},
+	github: {},
+	updatedAt: { type: Date, default: Date.now },
+	lastConnected: { type: Date, default: '' }
+});
 
-	findOrCreateOauthUser: function (provider, providerId) {
-		var user = module.exports.findByProviderId(provider, providerId);
-		if (!user) {
-			user = {
-				id: _.max(users,function (user) {
-					return user.id;
-				}).id + 1,
-				username: provider + '_user', // Should keep Oauth users anonymous on demo site
-				role: userRoles.user,
-				provider: provider
-			};
-			user[provider] = providerId;
-			users.push(user);
-		}
 
-		return user;
-	},
+/**
+ * Virtuals
+ */
 
-	findByProviderId: function (provider, id) {
-		return _.find(users, function (user) {
-			return user[provider] === id;
-		});
-	},
+UserSchema
+	.virtual('password')
+	.set(function(password) {
+		this._password = password;
+		this.salt = this.makeSalt();
+		this.hashed_password = this.encryptPassword(password)
+	})
+	.get(function() { return this._password });
 
-	validate: function (user) {
-		check(user.username, 'Username must be 1-20 characters long').len(1, 20);
-		check(user.password, 'Password must be 5-60 characters long').len(5, 60);
-		check(user.username, 'Invalid username').not(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/);
 
-		// TODO: Seems node-validator's isIn function doesn't handle Number arrays very well...
-		// Till this is rectified Number arrays must be converted to string arrays
-		// https://github.com/chriso/node-validator/issues/185
-		var stringArr = _.map(_.values(userRoles), function (val) {
-			return val.toString()
-		});
-		check(user.role, 'Invalid user role given').isIn(stringArr);
-	}
+/**
+ * Validations
+ */
 
+var validatePresenceOf = function (value) {
+	return value && value.length
 };
+
+UserSchema
+	.path('email')
+	.validate(function (value) {
+		if (authTypes.indexOf(this.provider) !== -1) return true;
+		var re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+		return re.test(value)
+	}, 'Invalid email');
+
+UserSchema.path('email').validate(function (email, fn) {
+	var User = mongoose.model('User');
+
+	// Check only when it is a new user or when email field is modified
+	if (this.isNew || this.isModified('email')) {
+		User.find({ email: email }).exec(function (err, users) {
+			fn(err || users.length === 0)
+		})
+	} else fn(true)
+}, 'Email already exists'); // todo: how to send an error to angular?
+
+UserSchema.path('username').validate(function (username) {
+	if (authTypes.indexOf(this.provider) !== -1) return true;
+	return username.length
+}, 'Username cannot be blank');
+
+UserSchema.path('hashed_password').validate(function (hashed_password) {
+	if (authTypes.indexOf(this.provider) !== -1) return true;
+	return hashed_password.length
+}, 'Password cannot be blank');
+
+/**
+ * Pre-save hook
+ */
+
+UserSchema.pre('save', function(next) {
+	if (!this.isNew) return next();
+
+	if (!validatePresenceOf(this.password) && authTypes.indexOf(this.provider) === -1)
+		next(new Error('Invalid password'));
+	else
+		next()
+});
+
+
+/**
+ * Methods
+ */
+
+UserSchema.methods = {
+
+	/**
+	 * Authenticate - check if the passwords are the same
+	 *
+	 * @param {String} plainText
+	 * @return {Boolean}
+	 * @api public
+	 */
+
+	authenticate: function (plainText) {
+		return this.encryptPassword(plainText) === this.hashed_password
+	},
+
+	/**
+	 * Make salt
+	 *
+	 * @return {String}
+	 * @api public
+	 */
+
+	makeSalt: function () {
+		return Math.round((new Date().valueOf() * Math.random())) + ''
+	},
+
+	/**
+	 * Encrypt password
+	 *
+	 * @param {String} password
+	 * @return {String}
+	 * @api public
+	 */
+
+	encryptPassword: function (password) {
+		if (!password) return '';
+		var encrypred;
+		try {
+			encrypred = crypto.createHmac('sha1', this.salt).update(password).digest('hex');
+			return encrypred
+		} catch (err) {
+			return ''
+		}
+	}
+};
+
+module.exports = mongoose.model('User', UserSchema);

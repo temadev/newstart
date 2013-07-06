@@ -1,6 +1,6 @@
 {
     "name": "newstart",
-    "version": "0.0.1",
+    "version": "0.0.2",
 	"author": "Artem Kashin <'dev.tema@gmail.com'> (http://temadev.github.com)",
 	"engines": {
 		"node": "0.10.x",
@@ -18,14 +18,10 @@
 	    "underscore": "latest",
 	    "validator": "latest",
 	    "mongoose": "latest",
-	    "angular-bridge": "latest",
         "passport": "latest",
         "passport-local": "latest",
         "passport-twitter": "latest",
         "passport-facebook": "latest",
-        "passport-google-oauth": "latest",
-        "passport-google": "latest",
-        "passport-linkedin": "latest",
         "passport-github": "latest"
     },
     "devDependencies": {

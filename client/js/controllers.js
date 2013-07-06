@@ -24,7 +24,7 @@ angular.module('angular-client-side-auth')
 			$scope.rememberme = true;
 			$scope.login = function () {
 				Auth.login({
-						username: $scope.username,
+						email: $scope.email,
 						password: $scope.password,
 						rememberme: $scope.rememberme
 					},

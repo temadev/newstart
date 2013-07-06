@@ -22,16 +22,6 @@ module.exports = {
 			clientID: '73ae4222ec5ccaef72df',
 			clientSecret: '8fc88196c74f6ab9e7cbd0aef191be2ebe3dfb48',
 			callbackURL: 'http://localhost:5000/auth/github/callback'
-		},
-		google: {
-			clientID: "435868730292.apps.googleusercontent.com",
-			clientSecret: "dMWZHfi9AyC2-1mVuiNU8KVL",
-			callbackURL: "http://localhost:5000/auth/google/callback"
-		},
-		linkedin: {
-			clientID: "9ae46969-9e5d-4afd-bc31-13a3c4cac0d1",
-			clientSecret: "4cff707b-afa3-4205-b772-c5f8fb37c7fb",
-			callbackURL: "http://localhost:5000/auth/linkedin/callback"
 		}
 	},
 	test: {
@@ -54,16 +44,6 @@ module.exports = {
 			clientID: '73ae4222ec5ccaef72df',
 			clientSecret: '8fc88196c74f6ab9e7cbd0aef191be2ebe3dfb48',
 			callbackURL: 'http://localhost:5000/auth/github/callback'
-		},
-		google: {
-			clientID: "73ae4222ec5ccaef72df",
-			clientSecret: "dMWZHfi9AyC2-1mVuiNU8KVL",
-			callbackURL: "http://localhost:5000/auth/google/callback"
-		},
-		linkedin: {
-			clientID: "9ae46969-9e5d-4afd-bc31-13a3c4cac0d1",
-			clientSecret: "4cff707b-afa3-4205-b772-c5f8fb37c7fb",
-			callbackURL: "http://localhost:5000/auth/linkedin/callback"
 		}
 	},
 	production: {

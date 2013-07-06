@@ -1,5 +1,5 @@
 var _ = require('underscore'),
-	User = require('../models/Mongo.js');
+	User = require('../models/User.js');
 
 module.exports = {
 	index: function (req, res) {
@@ -9,8 +9,6 @@ module.exports = {
 				delete user.password;
 				delete user.twitter;
 				delete user.facebook;
-				delete user.google;
-				delete user.linkedin;
 				delete user.github;
 			});
 

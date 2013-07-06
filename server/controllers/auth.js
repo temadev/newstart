@@ -1,21 +1,18 @@
 var passport = require('passport'),
-	User = require('../models/Mongo.js');
+	User = require('../models/User.js');
 
 module.exports = {
 
 	register: function (req, res, next) {
 
-		var user = new User();
+		var user = new User(req.body);
 
-		user.username = req.body.username;
-		user.email = req.body.email;
-		user.password = req.body.password;
+		user.provider = 'local';
 		user.role = req.body.role;
-
 
 		user.save(function(err){
 			if (err === 'UserAlreadyExists') return res.send(403, "User already exists");
-			else if (err) return res.send(500);
+			else if (err) return console.log(err);
 
 			passport.authenticate('local', function(err, user) {
 				if (err) return next(err);
@@ -24,7 +21,7 @@ module.exports = {
 					if (err) return next(err);
 					return res.json(200, {
 						"role": user.role,
-						"username": user.username
+						"email": user.email
 					});
 				});
 			})(req, res, next);
@@ -42,7 +39,7 @@ module.exports = {
 				if (req.body.rememberme) req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 7;
 				return res.json(200, {
 					"role": user.role,
-					"username": user.username
+					"email": user.email
 				});
 			});
 		})(req, res, next);

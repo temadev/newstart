@@ -14,8 +14,7 @@ table.table.table-striped(data-ng-hide="loading")
             td
                i.icon-twitter(data-ng-show="user.provider == 'twitter'")
                i.icon-facebook-sign(data-ng-show="user.provider == 'facebook'")
-               i.icon-google-plus-sign(data-ng-show="user.provider == 'google'")
-               i.icon-linkedin(data-ng-show="user.provider == 'linkedin'")
+               i.icon-github(data-ng-show="user.provider == 'github'")
                |  {{ user.username }}
             td
                 span.badge(data-ng-class='{"badge-info": user.role.title == userRoles.user.title, "badge-success": user.role.title == userRoles.admin.title}') {{ user.role.title }}
