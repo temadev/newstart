@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
  */
 
 var UserSchema = new Schema({
-	username: { type: String, default: '' },
+	username: { type: String, default: ''},
 	email: { type: String, default: '' },
 	role: {},
 	password: { type: String, default: '' },
@@ -19,7 +19,8 @@ var UserSchema = new Schema({
 	twitter: {},
 	google: {},
 	github: {},
-	updatedAt: { type: Date, default: Date.now }
+	updatedAt: { type: Date, default: Date.now },
+	lastConnected: { type: Date, default: '' }
 });
 
 
@@ -38,12 +39,12 @@ UserSchema
  * Virtual
  */
 
-UserSchema
-	.path('email')
-	.validate(function (value) {
-		var re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-		return re.test(value)
-	}, 'Invalid email');
+//UserSchema
+//	.path('email')
+//	.validate(function (value) {
+//		var re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+//		return re.test(value)
+//	}, 'Invalid email');
 
 
 /**
@@ -51,6 +52,21 @@ UserSchema
  */
 
 UserSchema.methods = {
+
+	findOrCreateOauthUser: function (provider) {
+		this.find({provider: provider}, function(err) {
+			if(err) {
+				user = {
+					username: provider + '_user', // Should keep Oauth users anonymous on demo site
+					role: userRoles.user,
+					provider: provider
+				};
+				user[provider] = providerId;
+				users.push(user);
+			}
+		});
+
+	},
 
 	/**
 	 * Authenticate - check if the passwords are the same

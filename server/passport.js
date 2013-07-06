@@ -5,7 +5,8 @@ var mongoose = require('mongoose'),
 //	GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
 	GoogleStrategy = require('passport-google').Strategy,
 	GitHubStrategy = require('passport-github').Strategy,
-	LinkedInStrategy = require('passport-linkedin').Strategy;
+	LinkedInStrategy = require('passport-linkedin').Strategy,
+	userRoles = require('../client/js/routingConfig').userRoles;
 
 module.exports = function (passport, config, User) {
 
@@ -51,11 +52,76 @@ module.exports = function (passport, config, User) {
 				callbackURL: config.twitter.callbackURL
 			},
 			function (token, tokenSecret, profile, done) {
-				var user = User.findOrCreateOauthUser(profile.provider, profile.id);
-				done(null, user);
+//				console.log(profile.id);
+
+				User.findOne({"twitter.id": profile.id}, function(err, user) {
+					if (!err && user != null) { // нет ошибки и пользователь найден
+						console.log('найден юзер по твиттер ид');
+						console.log(user);
+						User.update({"_id": user["_id"]}, { $set: {lastConnected: new Date()} } ).exec();
+						done(null, user)
+					}
+					else { // если совпадений не найдено
+						console.log('если совпадений не найдено')
+						var userData = new User({
+							username: profile._json.screen_name,
+							role: userRoles.user,
+							provider: profile.provider,
+							twitter: profile._json,
+							createdAt: Date.now()
+						});
+
+						userData.save(function(err) {
+							if (err) console.log(err);
+							else {
+								console.log('Saving user...');
+								done(null, userData)
+								}
+							}
+						)
+					}
+				});
+//				var user = { "twitter.id": profile.id };
+//				console.log(user);
+//				done(null, user);
 			}
 		)
 	);
+//	passport.use(
+//		new TwitterStrategy({
+//				consumerKey: config.twitter.clientID,
+//				consumerSecret: config.twitter.clientSecret,
+//				callbackURL: config.twitter.callbackURL
+//			},
+//			function (token, tokenSecret, profile, done) {
+//
+//				User.findOne({providerId: profile.id},
+//					function(err, user) {
+//						if (!err && user != null) {
+//							var ObjectId = mongoose.Types.ObjectId;
+//							User.update({"_id": user["_id"]}, { $set: {lastConnected: new Date()} } ).exec();
+//						} else {
+//							var userData = new User({
+//								provider: profile.provider,
+//								providerUsername: profile.username,
+//								providerId: profile.username + ":" + profile.id,
+//								created: Date.now(),
+//								oauthToken: token,
+//								username: profile.displayName,
+//								profilePicture: 'https://api.twitter.com/1/users/profile_image?screen_name=' + profile.username +'&size=bigger'
+//							});
+//							userData.save(function(err) {
+//								if (err) console.log(err);
+//								else console.log('Saving user...');
+//							});
+//						}
+//					}
+//				);
+//				var user = { id: profile.id, name: profile.username });
+//				done(null, user);
+//			}
+//		)
+//	);
 
 	passport.use(
 		new FacebookStrategy({
